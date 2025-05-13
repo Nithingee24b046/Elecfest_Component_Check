@@ -1,0 +1,12 @@
+#define BUZZER_PIN 23  // GPIO 23 connected to the buzzer
+
+void setup() {
+  pinMode(BUZZER_PIN, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(BUZZER_PIN, HIGH);  // Turn buzzer ON
+  delay(2000);                     // Wait 2 seconds
+  digitalWrite(BUZZER_PIN, LOW);   // Turn buzzer OFF
+  delay(2000);                     // Wait 2 seconds
+}
