@@ -1,0 +1,42 @@
+const int VRx = 34;  // X-axis
+const int VRy = 35;  // Y-axis
+const int SW = 32;   // Button (optional)
+
+int xValue = 0;
+int yValue = 0;
+int swState = 1;
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(SW, INPUT_PULLUP);  // Joystick button uses pull-up
+}
+
+void loop() {
+  xValue = analogRead(VRx);  // Read X
+  yValue = analogRead(VRy);  // Read Y
+  swState = digitalRead(SW); // Read button
+
+  String direction = "Center";
+
+  // Thresholds: tune based on actual values you observe
+  if (xValue < 1000) {
+    direction = "Left";
+  } else if (xValue > 3000) {
+    direction = "Right";
+  } else if (yValue < 1000) {
+    direction = "Down";
+  } else if (yValue > 3000) {
+    direction = "Up";
+  }
+
+  Serial.print("X: "); Serial.print(xValue);
+  Serial.print(" | Y: "); Serial.print(yValue);
+  Serial.print(" | Direction: "); Serial.print(direction);
+
+  if (swState == LOW) {
+    Serial.print(" | Button Pressed");
+  }
+
+  Serial.println();
+  delay(200);
+}
