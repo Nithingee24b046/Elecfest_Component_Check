@@ -1,0 +1,53 @@
+const int VRx = 34;  // X-axis pin
+const int VRy = 35;  // Y-axis pin
+const int SW = 32;   // Button pin
+
+String currentDirection = "Center";
+String lastDirection = "Center";  // To track changes
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(SW, INPUT_PULLUP);
+}
+
+void loop() {
+  int xValue = analogRead(VRx);
+  int yValue = analogRead(VRy);
+  int swState = digitalRead(SW);
+
+  // Define your fixed center range
+  bool inCenterZone = (xValue >= 2700 && xValue <= 2800 &&
+                       yValue >= 2700 && yValue <= 2800);
+
+  int xDeviation = xValue - 2750;
+  int yDeviation = yValue - 2750;
+
+  // Determine current direction
+  if (inCenterZone) {
+    currentDirection = "Center";
+  } else if (currentDirection == "Center") {
+    if (abs(xDeviation) > abs(yDeviation)) {
+      currentDirection = (xDeviation > 0) ? "Right" : "Left";
+    } else {
+      currentDirection = (yDeviation > 0) ? "Up" : "Down";
+    }
+  }
+
+  // Print only if direction changed
+  if (currentDirection != lastDirection) {
+    Serial.print("X: "); Serial.print(xValue);
+    Serial.print(" | Y: "); Serial.print(yValue);
+    Serial.print(" | Direction: "); Serial.print(currentDirection);
+
+    if (swState == LOW) {
+      Serial.print(" | Button Pressed");
+    }
+
+    Serial.println();
+
+    // Update last direction
+    lastDirection = currentDirection;
+  }
+
+  delay(50);  // Small delay for smoother experience
+}
