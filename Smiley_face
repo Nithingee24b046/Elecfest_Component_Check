@@ -18,8 +18,8 @@ const int Button = 32;
 
 String current = "Center";
 String last = "Center";
-String lastFace = "faceUp"
-String currentFace = "faceUp"
+String lastFace = "faceUp";
+String currentFace = "faceUp";
 
 // Face looking up
 uint8_t faceUp[8] = {
@@ -73,7 +73,10 @@ uint8_t faceRight[8] = {
 void drawFace(uint8_t face[]) {
   mx.clear();
   for (uint8_t row = 0; row < 8; row++) {
-    mx.setRow(0, row, face[row]);
+    for (uint8_t col = 0; col < 8; col++) {
+      bool pixel = bitRead(face[row], 7 - col); // MSB on left
+      mx.setPoint(row, col, pixel);
+    }
   }
 }
 
@@ -106,7 +109,10 @@ void loop() {
     current = (yDeviation > 0) ? "Up" : "Down";
   }
 
-  // Update face only if direction changes
+  if (last == "Right" && current == "Up") {
+  current = "Right";  // Ignore jitter — stay in right direction
+  } 
+  
   if (current != last) {
     Serial.print("X: "); Serial.print(xValue);
     Serial.print(" | Y: "); Serial.print(yValue);
@@ -118,38 +124,37 @@ void loop() {
 
     Serial.println();
 
-    if (currentFace == "faceUp"){
+    if (currentFace == "faceUp") {
       if (current == "Right") {
-      drawFace(faceRight);
+        drawFace(faceRight); currentFace = "faceRight";
       } else if (current == "Left") {
-      drawFace(faceLeft);
+        drawFace(faceLeft); currentFace = "faceLeft";
       } else if (current == "Down") {
-      drawFace(faceDown);
+        drawFace(faceDown); currentFace = "faceDown";
       }
-    } else if (currentFace == "faceRight"){
+    } else if (currentFace == "faceRight") {
       if (current == "Right") {
-      drawFace(faceDown);
+        drawFace(faceDown); currentFace = "faceDown";
       } else if (current == "Left") {
-      drawFace(faceUp);
-      } 
-    } else if (currentFace == "faceLeft"){
+        drawFace(faceUp); currentFace = "faceUp";
+      }
+    } else if (currentFace == "faceLeft") {
       if (current == "Right") {
-      drawFace(faceUp);
-      } else if (current == "Right") {
-      drawFace(faceDown);
-      } 
-    } else if (currentFace == "faceDown"){
-      if (current == "Right") {
-      drawFace(faceLeft);
+        drawFace(faceUp); currentFace = "faceUp";
       } else if (current == "Left") {
-      drawFace(faceRight);
+        drawFace(faceDown); currentFace = "faceDown";
+      }
+    } else if (currentFace == "faceDown") {
+      if (current == "Right") {
+        drawFace(faceLeft); currentFace = "faceLeft";
+      } else if (current == "Left") {
+        drawFace(faceRight); currentFace = "faceRight";
       } else if (current == "Up") {
-      drawFace(faceUp);
-      } 
-    } 
+        drawFace(faceUp); currentFace = "faceUp";
+      }
+    }
 
     last = current;
   }
-
-  delay(50);
+  delay(10);
 }
