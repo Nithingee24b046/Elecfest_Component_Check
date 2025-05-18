@@ -33,6 +33,10 @@ void loop() {
     }
   }
 
+  if (currentDirection == "Up" && lastDirection == "Right"){
+    currentDirection == "Right";
+  }
+
   // Print only if direction changed
   if (currentDirection != lastDirection) {
     Serial.print("X: "); Serial.print(xValue);
